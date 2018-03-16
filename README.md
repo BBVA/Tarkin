@@ -16,9 +16,13 @@ In Ubuntu, Mint and Debian you can install Python 3 like this:
 
 
     $ sudo apt-get install python3 python3-pip
+    
+In OS X you can install Python using [Brew](https://brew.sh) like this:
+
+    $ brew install python3
 
 
-For other Linux flavors, OS X and Windows, packages are available at
+For other Linux flavors and Windows, packages are available at
 
 [http://www.python.org/getit/](http://www.python.org/getit/)
 
@@ -43,6 +47,7 @@ will not configure the environment to run installed modules from the command lin
 
     $ python3 -m pip install -U virtualenv
     $ python3 -m virtualenv env
+    $ source ./env/bin/activate  # Enter into VirtualEnv
 
 
 # Quick start
