@@ -4,8 +4,8 @@
 
 download_default_dict
 
-mkdir -p security-anomalies-logs-data/input-data/
-mkdir -p security-anomalies-logs-data/metrics/
+mkdir -p Tarkin/input-data/
+mkdir -p Tarkin/metrics/
 
 docker build --rm -f Dockerfile-check -t tarkin-check:latest .
 docker build --rm -f Dockerfile-check-demo -t tarkin-check-demo:latest .

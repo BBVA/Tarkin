@@ -11,7 +11,7 @@ RUN pip install wheel
 
 FROM python:3.6.3-slim
 
-COPY security-anomalies-logs-data /tarkin/security-anomalies-logs-data
+COPY Tarkin /tarkin/Tarkin
 COPY setup.py /tarkin/setup.py
 
 COPY --from=tarkin_build /tarkin /tarkin
@@ -23,5 +23,5 @@ RUN python -m spacy download en
 
 RUN rm -rf /root/.cache
 
-ENV PYTHONPATH=security-anomalies-logs-data/
-ENTRYPOINT python security-anomalies-logs-data/service/check.py
+ENV PYTHONPATH=Tarkin/
+ENTRYPOINT python Tarkin/service/check.py

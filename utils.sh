@@ -1,4 +1,4 @@
-VOCAB_RES_FOLDER=security-anomalies-logs-data/data/vocab
+VOCAB_RES_FOLDER=Tarkin/data/vocab
  
 DEFAULT_DICT_URL=https://drive.google.com/uc?id=0B0ChLbwT19XcOVZFdm5wNXA5ODg
 DEFAULT_DICT_NAME=SentiWordNet_3.0.0_20130122
@@ -11,7 +11,7 @@ function download_default_dict(){
 
     curl -L $DEFAULT_DICT_URL -o $VOCAB_RES_FOLDER/$DEFAULT_DICT_NAME.tgz
 
-    mkdir -p security-anomalies-logs-data/data/vocab
+    mkdir -p Tarkin/data/vocab
     pushd $VOCAB_RES_FOLDER
     tar -xvf $DEFAULT_DICT_NAME.tgz --strip-components=5
     rm $DEFAULT_DICT_NAME.tgz

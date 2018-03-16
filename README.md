@@ -4,9 +4,39 @@ Tarkin is a project aimed to perform anomaly detection over security logs data.
 
 # Approach
 
-Detecting a particular type of anomaly, and especially those related with security, requires something else apart from
-statistics. For this reason, we decided to apply machine learning in order to simulate the intuition of human analysts
-faced to this problem.
+Have you ever felt a shiver down your spine at the sight of a log line, even before reading it completely? That's because 
+you spotted something unusual and probably one or two old keywords that, in your experience, are usually associated with issues.
+
+Detecting anomalies, and especially security-related ones, is a hard job that too often requires going through zillions 
+of log lines, queue messages, database registers, etc. To make things even more difficult this usually happens under tight
+time pressure to identify the origin and reasons of an incident. 
+
+There are tools out there that promise to reduce this load by classifying them automatically but they are barely 
+more than specialized spam filters that pay little to none attention to the meaning of the message, and still require
+to check on each tagged result to help improving the accuracy, making us work for the system but offering no flexibility. 
+ 
+We believe it takes more than statistics to spot particular types of anomalies. Also, we believe simplicity is the key
+for powerful systems. This is why we decided to emulate the intuition of human analysts faced to this problem, modelling
+the "fear" the feel by reading the logs through the filters of their instinct and domain experience.    
+
+The project is named after the Grand Moff Tarkin, a Star Wars character who lends his name to the Tarkin Doctrine, a
+policy based he proposed to allow the Empire rule the galaxy without the burden of bureaucracy. 
+
+## How it works (in a nutshell)
+
+Tarkin implements a pipelined models strategy that starts applying a character frequency analysis to the content of the
+message. 
+
+![Character Frequency Scoring](./docs/static/images/frequency_scoring.png)
+
+Then adds sentiment analysis on top of that to show only messages with an overall negative meaning.
+
+![Sentiment Analysis Scoring](./docs/static/images/sentiment_scoring.png)
+
+The result is an indicator of the "fear" perceived in each message by the system, which is used to filter out the ones
+below the set threshold.
+
+![System Output](./docs/static/images/system_output.png)
 
 # Requirements
 
@@ -80,7 +110,7 @@ you'll need to execute the following commands from your virtual env:
     $ python3 -m pip install jupyter seaborn matplotlib
     $ jupyter notebook
 
-Then navigate on your browser to security-anomalies-logs-data/notebooks from the Jupyter Home tree 
+Then navigate on your browser to Tarkin/notebooks from the Jupyter Home tree 
 and open the file <code>Log Mining.ipynb</code>. 
 
 In case you experience an error running the notebook cells, make sure you executed the <code>./build.sh</code> script 
@@ -89,7 +119,7 @@ by the notebook, or do it again if unsure.
 
 # Contributing
 
-Feedback, ideas and contributions are welcome. For more details, please see the CONTRIBUTING.md file.
+Feedback, ideas and contributions are welcome. For more details, please see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 # License
 

@@ -28,8 +28,8 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     entry_points={'console_scripts': [
-        'tarkin-train = security-anomalies-logs-data.train:main',
-        'tarkin-check = security-anomalies-logs-data.check:main',
+        'tarkin-train = Tarkin.train:main',
+        'tarkin-check = Tarkin.check:main',
     ]},
     description='Fear-based detection of Security Anomalies in Log Data',
     url='https://github.com/BBVA/Tarkin',

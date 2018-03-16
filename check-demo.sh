@@ -2,11 +2,11 @@
 
 . utils.sh
 
-export PYTHONPATH=$(pwd)/security-anomalies-logs-data/
+export PYTHONPATH=$(pwd)/Tarkin/
 
-LETTERSPACE_FILENAME=${2:-security-anomalies-logs-data/input-data/letterspace.pkl}
+LETTERSPACE_FILENAME=${2:-Tarkin/input-data/letterspace.pkl}
 check_file_existence $LETTERSPACE_FILENAME
 
 # passing a temp directory for metrics would be nice
-mkdir -p security-anomalies-logs-data/metrics/
-time echo $@ | python security-anomalies-logs-data/service/check-test.py
+mkdir -p Tarkin/metrics/
+time echo $@ | python Tarkin/service/check-test.py

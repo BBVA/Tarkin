@@ -1,1 +1,8 @@
-/**/letterspace.pkl
+.ipynb_checkpoints/
+.idea/*
+Tarkin/metrics/*
+Tarkin/data/vocab/*
+Tarkin/input-data/*
+Tarkin/notebooks/.ipynb_checkpoints/
+Tarkin/notebooks/__pycache__/
+Tarkin/service/__pycache__/

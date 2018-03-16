@@ -2,5 +2,5 @@ FROM tarkin-check:latest
 
 WORKDIR /tarkin
 
-ENV PYTHONPATH=security-anomalies-logs-data/
-ENTRYPOINT python security-anomalies-logs-data/service/check-test.py
+ENV PYTHONPATH=Tarkin/
+ENTRYPOINT python Tarkin/service/check-test.py
