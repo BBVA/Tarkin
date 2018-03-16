@@ -24,19 +24,18 @@ policy based he proposed to allow the Empire rule the galaxy without the burden 
 
 ## How it works (in a nutshell)
 
-Tarkin implements a pipelined models strategy that starts applying a character frequency analysis to the content of the
-message. 
+Tarkin implements a pipelined models strategy. The first step is training a character frequency model with a messages sample, then apply it to the content of testing/fresh incoming messages: 
 
-![Character Frequency Scoring](./docs/static/images/frequency_scoring.png)
+<img src="./docs/static/images/frequency_scoring.png" width="60%" alt="Character Frequency Scoring"/>
 
-Then adds sentiment analysis on top of that to show only messages with an overall negative meaning.
+Then, adds sentiment analysis on top of that to show only messages with an overall negative meaning:
 
-![Sentiment Analysis Scoring](./docs/static/images/sentiment_scoring.png)
+<img src="./docs/static/images/sentiment_scoring.png" width="60%" alt="Sentiment Analysis Scoring" />
 
-The result is an indicator of the "fear" perceived in each message by the system, which is used to filter out the ones
-below the set threshold.
+The resulting output is an indicator of the "fear" perceived in each message by the system, which is used to filter out the ones
+below a threshold set by the model:
 
-![System Output](./docs/static/images/system_output.jpeg)
+<img src="./docs/static/images/system_output.jpeg" width="60%" alt="System Output" />
 
 # Requirements
 
