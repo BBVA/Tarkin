@@ -1,7 +1,6 @@
 #!/bin/bash
 
 . utils.sh
-download_default_dict
 
 export PYTHONPATH=$(pwd)/Tarkin/
 
@@ -21,11 +20,11 @@ time cat $CHECK_INPUT_FILE | python Tarkin/service/check.py > $CHECK_OUTPUT_FILE
 
 cat $CHECK_OUTPUT_FILE | jq
 echo ""
-echo "# Total logs en el fichero de entrada:"
+echo "# Total logs in input file:"
 cat $CHECK_INPUT_FILE | wc -l
-echo "# logs anómalos:"
+echo "# Infrequent logs:"
 cat $CHECK_OUTPUT_FILE | wc -l
-echo "# logs temibles:"
+echo "# Distressing logs:"
 cat $CHECK_OUTPUT_FILE | grep - | wc -l
 
 rm -rf $TMPDIRNAME

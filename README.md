@@ -36,7 +36,7 @@ Then adds sentiment analysis on top of that to show only messages with an overal
 The result is an indicator of the "fear" perceived in each message by the system, which is used to filter out the ones
 below the set threshold.
 
-![System Output](./docs/static/images/system_output.png)
+![System Output](./docs/static/images/system_output.jpeg)
 
 # Requirements
 

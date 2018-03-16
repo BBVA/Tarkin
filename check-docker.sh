@@ -17,11 +17,11 @@ time cat $CHECK_INPUT_FILE | docker run -i -v $TMPDIRNAME:/tarkin/Tarkin/input-d
 
 cat $CHECK_OUTPUT_FILE | jq
 echo ""
-echo "# Total logs en el fichero de entrada:"
+echo "# Total logs in input file:"
 cat $CHECK_INPUT_FILE | wc -l
-echo "# logs anómalos:"
+echo "# Infrequent logs:"
 cat $CHECK_OUTPUT_FILE | wc -l
-echo "# logs temibles:"
+echo "# Distressing logs:"
 cat $CHECK_OUTPUT_FILE | grep - | wc -l
 
 rm -rf $TMPDIRNAME
