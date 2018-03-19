@@ -17,6 +17,6 @@ def test_stats_model():
     op = pipeline(model)
 
     res = op("ble ble")
-    print(res[0])
+    print(res)
     assert res is not None
-    assert res is 1
+    assert res is 0
