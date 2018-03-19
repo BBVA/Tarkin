@@ -1,28 +1,29 @@
 from functools import reduce
-from datarefinery.tuple.TupleDSL import compose
 
+
+def compose(*funcs):
+    def _comp(a, b):
+        def _app(*n):
+            return b(*a(*n))
+
+        return _app
+
+    return reduce(_comp, funcs)
 
 
 def sequential(*tuple_operations):
-    def _no_operations(inp=None, err=None):
-        return None, "No operations to perform"
+    def _no_operations(*x):
+        return None
 
-    def _no_affect(inp, err=None):
-        if inp is not None:
-            i = copy.deepcopy(inp)
-        else:
-            i = None
-        if err is not None:
-            e = copy.deepcopy(err)
-        else:
-            e = None
-        return i, e
-
-    some_params = any(map(lambda x: x is not None, tuple_operations))
-    if tuple_operations is not None and some_params:
-        return compose(_no_affect, reduce(compose, tuple_operations))
+    if tuple_operations is not None and len(tuple_operations) > 1:
+        return reduce(compose, tuple_operations)
+    elif tuple_operations is not None and len(tuple_operations) == 1:
+        return tuple_operations[0]
     return _no_operations
 
 
-def pipeline(models*):
-  return sequential(models)
+def pipeline(*models):
+    valid_models = list(filter(lambda x: x is not None, models))
+    if len(valid_models) > 0:
+        return sequential(valid_models)
+    return lambda *x: None

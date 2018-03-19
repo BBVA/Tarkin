@@ -4,6 +4,6 @@ Tarkin/metrics/*
 Tarkin/data/vocab/*
 Tarkin/input-data/*
 Tarkin/notebooks/.ipynb_checkpoints/
-Tarkin/notebooks/__pycache__/
-Tarkin/service/__pycache__/
+/**/__pycache__/
 /**/letterspace.pkl
+.pytest_cache/
