@@ -1,5 +1,6 @@
+#!/bin/bash
+
 VOCAB_RES_FOLDER=Tarkin/data/vocab
- 
 DEFAULT_DICT_URL=https://drive.google.com/uc?id=0B0ChLbwT19XcOVZFdm5wNXA5ODg
 DEFAULT_DICT_NAME=SentiWordNet_3.0.0_20130122
  
@@ -9,15 +10,15 @@ function download_default_dict(){
     # SentiWordNet 3.0 by Stefano Baccianella, Andrea Esuli, and Fabrizio Sebastiani
     # http://sentiwordnet.isti.cnr.it
 
-    curl -L $DEFAULT_DICT_URL -o $VOCAB_RES_FOLDER/$DEFAULT_DICT_NAME.tgz
+    mkdir -p ${VOCAB_RES_FOLDER}
+    curl -L ${DEFAULT_DICT_URL} -o ${VOCAB_RES_FOLDER}/${DEFAULT_DICT_NAME}.tgz
 
-    mkdir -p Tarkin/data/vocab
-    pushd $VOCAB_RES_FOLDER
-    tar -xvf $DEFAULT_DICT_NAME.tgz --strip-components=5
-    rm $DEFAULT_DICT_NAME.tgz
+    pushd ${VOCAB_RES_FOLDER}
+    tar -xvf ${DEFAULT_DICT_NAME}.tgz --strip-components=5
+    rm ${DEFAULT_DICT_NAME}.tgz
     popd
 
-    check_file_existence $VOCAB_RES_FOLDER/$DEFAULT_DICT_NAME.txt
+    check_file_existence ${VOCAB_RES_FOLDER}/${DEFAULT_DICT_NAME}.txt
 
 }
 
@@ -43,5 +44,5 @@ function create_temp_dir(){
        exit 1
     fi
 
-    echo $TMPDIRNAME
+    echo ${TMPDIRNAME}
 }
