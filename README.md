@@ -1,6 +1,6 @@
 # Tarkin
 
-<img src="./docs/static/images/tarkin_logo.jpg" width="60%" alt="System Output" />
+<img src="./docs/static/images/tarkin_logo.jpg" width="20%" alt="System Output" />
 
 Tarkin is a project aimed to perform anomaly detection over streaming data like logs or queue messages.
 
