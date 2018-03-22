@@ -2,29 +2,24 @@
 
 Tarkin is a project aimed to perform anomaly detection over security logs data.
 
-# Approach
+# Introduction
 
-Have you ever felt a shiver down your spine at the sight of a log line, even before reading it completely? That's because 
-you spotted something unusual and probably one or two old keywords that, in your experience, are usually associated with issues.
-
-Detecting anomalies, and especially security-related ones, is a hard job that too often requires going through zillions 
-of log lines, queue messages, database registers, etc. To make things even more difficult this usually happens under tight
-time pressure to identify the origin and reasons of an incident. 
-
-There are tools out there that promise to reduce this load by classifying them automatically but they are barely 
-more than specialized spam filters that pay little to none attention to the meaning of the message, and still require
-to check on each tagged result to help improving the accuracy, making us work for the system but offering no flexibility. 
+Have you ever felt a shiver down your spine at the sight of a log line, even before reading it completely? That's what 
+happens when you spot something unusual and maybe one or two old keywords that, in your experience, are associated with issues. 
  
-We believe it takes more than statistics to spot particular types of anomalies. Also, we believe simplicity is the key
-for powerful systems. This is why we decided to emulate the intuition of human analysts faced to this problem, modelling
-the "fear" the feel by reading the logs through the filters of their instinct and domain experience.    
+Tarkin emulates this intuition by composing models of the intuition and domain experience human analysts have acquired, and
+adds the capability of analyzing messages in streaming to raise awareness immediately. 
 
-The project is named after the Grand Moff Tarkin, a Star Wars character who lends his name to the Tarkin Doctrine, a
-policy based he proposed to allow the Empire rule the galaxy without the burden of bureaucracy. 
+Forget about creating rules and tagging messages, *fear* will keep the local systems online.
 
-## How it works (in a nutshell)
+## What about the name?
 
-Tarkin implements a pipelined models strategy. The first step is training a character frequency model with a messages sample, then apply it to the content of testing/fresh incoming messages: 
+The project named after the Grand Moff Tarkin, the famous Star Wars character, who envisioned a governing system based
+on the fear of the Death Star which would have allowed the Empire rule the galaxy without the burden of bureaucracy. 
+
+# How it works (in a nutshell)
+
+Tarkin implements a model pipelining strategy. The first step is training a character frequency model with a messages sample, then apply it to the content of testing/fresh incoming messages: 
 
 <img src="./docs/static/images/frequency_scoring.png" width="60%" alt="Character Frequency Scoring"/>
 

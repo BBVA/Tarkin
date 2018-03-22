@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PYTHONPATH=$(pwd)/Tarkin/
+export PYTHONPATH=$(pwd)
 
 . utils.sh
 

@@ -16,14 +16,15 @@ limitations under the License.
 import sys
 from collections import Counter
 from statistics import mean
-from json import dumps
+from json import dumps as json_dumps
 
 from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
-from service.Stats import Stats, read_letter_space
-from service.sentiment import load_sentiment_model
+from Tarkin.service.Stats import Stats, read_letter_space
+from Tarkin.service.sentiment import load_sentiment_model
+
 
 CHECK_METRICS_FILE = "Tarkin/metrics/check-metrics.txt"
 
@@ -56,6 +57,7 @@ def surprise_model(letter_space):
 
 
 def check():
+
     letter_space = read_letter_space(LETTER_SPACE)
     if letter_space is None:
         raise RuntimeError("A letterspace file is required and couldn't be found")
@@ -76,11 +78,11 @@ def check():
             if surprise_score > surprise_max - surprise_variance:
                 sentiment_score = sentiment_model(msg)
                 if sentiment_score <= 0:
-                    print(dumps({"surprise": surprise_score, "sentiment_score": sentiment_score}))
+                    print(json_dumps({"surprise": surprise_score, "sentiment_score": sentiment_score}))
             surprise_threshold = surprise_threshold.add_variable(surprise_score)
 
         except:
-            print(dumps({"surprise": 1, "sentiment_score": -1}))
+            print(json_dumps({"surprise": 1, "sentiment_score": -1}))
 
     with open(CHECK_METRICS_FILE, 'w') as metrics_output:
         print(surprise_threshold, file=metrics_output)

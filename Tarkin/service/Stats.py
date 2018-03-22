@@ -76,7 +76,7 @@ class Stats:
         )
 
 
-def save_letter_space(path: str, letter_space):
+def save_letter_space(path: str, letter_space: dict):
     with open(path, 'wb+') as output:
         pickle.dump(letter_space, output, pickle.HIGHEST_PROTOCOL)
 
