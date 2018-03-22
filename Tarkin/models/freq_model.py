@@ -15,61 +15,26 @@ limitations under the License.
 """
 
 from collections import Counter
-
-from datarefinery.CombineOperations import sequential
-from datarefinery.TupleOperations import append, keep, wrap
-from datarefinery.tuple.Formats import csv_to_map
+from statistics import mean
 
 from ..service.Stats import Stats
 
 
-def gen_model(initial_letter_space: dict = {}):
-
-    # def _app0(message: str, init_letterspace={}):
-    #     return train(message, init_letterspace)
-
-    # def _app(message: str, **kwargs):
-    #
-    #     letter_space = kwargs.get('initial_letter_space', initial_letter_space)
-    #
-    #     if isinstance(letter_space, dict):
-    #         return train(message, letter_space)
-    #
-    #     raise ValueError("Invalid letterspace")
-
-    def _app(*args, **kwargs):
-
-        letter_space = kwargs.get('initial_letter_space', initial_letter_space)
-
-        message = args[-1]
+def gen_model():
+    def _app(msg, letter_space=None):
+        if letter_space is None:
+            letter_space = {}
 
         if isinstance(letter_space, dict):
-            return train(message, letter_space)
+            return train(msg, letter_space)
 
         raise ValueError("Invalid letterspace")
-
 
     return _app
 
 
-# should probably be added as the first chained operation at the pipeline
-def etl():
-    return sequential(
-        csv_to_map([
-            'date', 'file', 'date2', 'log', 'app', 'beat', 'front', 'is_log',
-            'msg', 'offset', 'arch'
-        ]),
-        keep(["msg"]),
-        append(['msg'], wrap(lambda x: dict(Counter(x.lower()))))
-    )
-
-
-def train(message, init_letter_space):
-    operation = etl()
-
-    letter_space = init_letter_space.copy()
-
-    (res, err) = operation(message)
+def train(message, letter_space):
+    res = dict(Counter(message.lower()))
     if res is not None:
         for letter, count in res.items():
             if letter not in letter_space:
@@ -79,11 +44,24 @@ def train(message, init_letter_space):
 
             letter_space[letter] = stats.add_variable(count)
 
-    return letter_space, message
+    return letter_space
 
 
-def check(message: str):
-    pass
+def check(letter_space):
+    if letter_space is None:
+        return lambda *x: None
+
+    def char_count(msg):
+        return dict(Counter(msg.lower()))
+
+    def _app(msg):
+        chars = char_count(msg)
+        counts = [
+            1 if k not in chars else v.is_in_std(chars[k])
+            for k, v in letter_space.items()
+        ]
+        return mean(counts)
+    return _app
 
 
 __all__ = ["gen_model"]

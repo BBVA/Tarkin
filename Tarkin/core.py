@@ -15,16 +15,14 @@ limitations under the License.
 """
 
 from functools import reduce
+from itertools import repeat
 from typing import Callable, Any
 
 
 def compose(*funcs):
     def _comp(a, b):
-        def _app(*n):
-            # uncomment, modify the signature of the models to receive a *params list and process only the last one
-            return b(*a(*n))
-            # n_ = a(*n)
-            # return n_[0], b(n_[1])
+        def _app(n):
+            return b(a(n))
 
         return _app
 
@@ -47,7 +45,35 @@ def sequential(*operations_tuple: Callable) -> Callable:
 
 
 def pipeline(*models: Callable) -> Callable:
+    """
+     f(models) -> f(msg) -> msg
+    """
     valid_models = list(filter(lambda x: x is not None, models))
     if len(valid_models) > 0:
         return sequential(*valid_models)
     return lambda *x: None
+
+
+def train(*models):
+    """
+     f(models) -> f(msg, Optional[states]) -> states
+    """
+    valid_models = list(filter(lambda x: x is not None, models))
+    size_valid_models = len(valid_models)
+    if size_valid_models <= 0:
+        return lambda *x: None
+
+    def _apply_model(x):
+        (model, msg, state) = x
+        return model(msg, state)
+
+    def _initialize_states_tuple(states):
+        if len(states) > 0:
+            return states
+        return repeat(None, size_valid_models)
+
+    def _app(msg, *states):
+        to_iter = zip(valid_models, repeat(msg), _initialize_states_tuple(states))
+        return list(map(_apply_model, to_iter))
+
+    return _app

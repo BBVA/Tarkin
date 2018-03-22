@@ -65,7 +65,7 @@ class Stats:
             self.get_mean_value() - self.get_std(),
             self.get_mean_value() + self.get_std()
         )
-        if lower <= x < higher:
+        if lower <= x <= higher:
             return 0
         return 1
 
