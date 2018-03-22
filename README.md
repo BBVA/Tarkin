@@ -1,23 +1,24 @@
-# Security Anomalies in Logs Data
+# Tarkin
 
-Tarkin is a project aimed to perform anomaly detection over security logs data.
+<img src="./docs/static/images/tarkin_logo.jpg" width="60%" alt="System Output" />
+
+Tarkin is a project aimed to perform anomaly detection over streaming data like logs or queue messages.
 
 # Introduction
 
-Have you ever felt a shiver down your spine at the sight of a log line, even before reading it completely? That's what 
-happens when you spot something unusual and maybe one or two old keywords that, in your experience, are associated with issues. 
- 
-Tarkin emulates this intuition by composing models of the intuition and domain experience human analysts have acquired, and
-adds the capability of analyzing messages in streaming to raise awareness immediately. 
+Detecting anomalies is a hard job that usually requires going through zillions of log lines, queue messages, database registers, etc. 
+There are tools that automate this classification and throw alerts at the price of constantly tagging messages and 
+updating the rules, which is also painful.  
 
-Forget about creating rules and tagging messages, *fear* will keep the local systems online.
+Tarkin is an extensible platform that emulates the intuition of human analysts by running models of their domain experience,
+and provides the capability of analyzing data in streaming, raising awareness of anomalies immediately. 
 
 ## What about the name?
 
 The project named after the Grand Moff Tarkin, the famous Star Wars character, who envisioned a governing system based
-on the fear of the Death Star which would have allowed the Empire rule the galaxy without the burden of bureaucracy. 
+on the fear of the Death Star that would allow the Empire to rule the galaxy without the burden of bureaucracy. 
 
-# How it works (in a nutshell)
+## How it works (in a nutshell)
 
 Tarkin implements a model pipelining strategy. The first step is training a character frequency model with a messages sample, then apply it to the content of testing/fresh incoming messages: 
 
