@@ -6,6 +6,8 @@ DEFAULT_DICT_NAME=SentiWordNet_3.0.0_20130122
  
 function download_default_dict(){
 
+    mkdir -p Tarkin/data/vocab
+
     # Download default lexicon file
     # SentiWordNet 3.0 by Stefano Baccianella, Andrea Esuli, and Fabrizio Sebastiani
     # http://sentiwordnet.isti.cnr.it

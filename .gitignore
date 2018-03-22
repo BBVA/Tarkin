@@ -7,3 +7,4 @@ Tarkin/notebooks/.ipynb_checkpoints/
 /**/__pycache__/
 /**/letterspace.pkl
 .pytest_cache/
+/.env/
