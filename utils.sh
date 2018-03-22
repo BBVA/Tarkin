@@ -5,13 +5,14 @@ DEFAULT_DICT_NAME=SentiWordNet_3.0.0_20130122
  
 function download_default_dict(){
 
+    mkdir -p Tarkin/data/vocab
+
     # Download default lexicon file
     # SentiWordNet 3.0 by Stefano Baccianella, Andrea Esuli, and Fabrizio Sebastiani
     # http://sentiwordnet.isti.cnr.it
 
     curl -L $DEFAULT_DICT_URL -o $VOCAB_RES_FOLDER/$DEFAULT_DICT_NAME.tgz
 
-    mkdir -p Tarkin/data/vocab
     pushd $VOCAB_RES_FOLDER
     tar -xvf $DEFAULT_DICT_NAME.tgz --strip-components=5
     rm $DEFAULT_DICT_NAME.tgz
