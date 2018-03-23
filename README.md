@@ -1,24 +1,23 @@
-# Tarkin
+# What is Tarkin?
 
 <img src="./docs/static/images/tarkin_logo.jpg" width="20%" alt="System Output" />
 
-Tarkin is a project aimed to perform anomaly detection over streaming data like logs or queue messages.
+Tarkin is an extensible project that allows you to emulate the intuition of human analysts at scale and immediately 
+raise awareness of anomalies by running models of their domain experience in streaming. 
 
 # Introduction
 
 Detecting anomalies is a hard job that usually requires going through zillions of log lines, queue messages, database registers, etc. 
-There are tools that automate this classification and throw alerts at the price of constantly tagging messages and 
-updating the rules, which is also painful.  
+There are tools that automate this classification to some extent and throw alerts, at the price of constantly updating rules
+and retagging misclassified messages.  
 
-Tarkin is an extensible platform that emulates the intuition of human analysts by running models of their domain experience,
-and provides the capability of analyzing data in streaming, raising awareness of anomalies immediately. 
 
 ## What about the name?
 
 The project named after the Grand Moff Tarkin, the famous Star Wars character, who envisioned a governing system based
 on the fear of the Death Star that would allow the Empire to rule the galaxy without the burden of bureaucracy. 
 
-## How it works (in a nutshell)
+## How does it work (in a nutshell)
 
 Tarkin implements a model pipelining strategy. The first step is training a character frequency model with a messages sample, then apply it to the content of testing/fresh incoming messages: 
 
