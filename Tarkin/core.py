@@ -68,11 +68,11 @@ def train(*models):
         return model(msg, state)
 
     def _initialize_states_tuple(states):
-        if len(states) > 0:
+        if states is not None and len(states) > 0:
             return states
         return repeat(None, size_valid_models)
 
-    def _app(msg, *states):
+    def _app(msg, states=None):
         to_iter = zip(valid_models, repeat(msg), _initialize_states_tuple(states))
         return list(map(_apply_model, to_iter))
 

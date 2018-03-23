@@ -20,13 +20,13 @@ from statistics import mean
 from ..service.Stats import Stats
 
 
-def gen_model():
+def gen_model(etl):
     def _app(msg, letter_space=None):
         if letter_space is None:
             letter_space = {}
 
         if isinstance(letter_space, dict):
-            return train(msg, letter_space)
+            return train(etl(msg), letter_space)
 
         raise ValueError("Invalid letterspace")
 

@@ -1,4 +1,4 @@
-from Tarkin.core import pipeline, train
+from Tarkin.core import pipeline, train, compose
 from Tarkin.models.freq_model import gen_model as gen_freq_model
 from Tarkin.models.freq_model import check as check_freq_model
 
@@ -7,9 +7,6 @@ from Tarkin.service.Stats import Stats
 from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
-from datarefinery.tuple.TupleDSL import compose
-
-from pprint import pprint
 
 
 def test_freq_train_model_empty():
@@ -38,7 +35,7 @@ def _gen_letter_space(init):
 
 
 def test_freq_train_model():
-    model = gen_freq_model()
+    model = gen_freq_model(lambda x: x)
     op = train(model)
 
     res = op("ble ble")
@@ -79,58 +76,96 @@ def _etl():
         ]),
         keep(["msg"])
     )
-    return compose(proc, lambda x, err: x['msg'])
+
+    def _just_msg(x):
+        (res, err) = x
+        return res['msg']
+
+    return compose(proc, _just_msg)
 
 
-def test_freq_model_basic():
+def test_freq_model_no_initial_state():
     etl = _etl()
-    model = gen_freq_model()
+    model = gen_freq_model(etl)
     op = train(model)
 
-    # compose the model with their ETL better
-    res = op(etl('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"'))
-    pprint(res)
-    assert res is not None
-    assert isinstance(res[0], dict)
-
-
-def test_freq_model_basic_initialized():
-    test_letter_stats = Stats()
-    model = gen_freq_model(initial_letter_space={'0': test_letter_stats.add_variable(127)})
-
-    op = pipeline(model)
     res = op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
-    pprint(res)
-    assert res is not None
-    assert isinstance(res[0], dict)
-    assert res[0].get('0').get_variance() == 7200
 
-
-def test_freq_model_double_uninitialized():
-    model = gen_freq_model()
-    op = pipeline(model)
-
-    res1 = op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
-    print ("-----")
-    res = op('"2001-01-01T23:52:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b36eaabddb894bc93822a37d0e] INFO module-n2 - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
-
-    pprint(res)
     assert res is not None
     assert isinstance(res[0], dict)
 
 
-def test_freq_model_second_initialized():
-    model = gen_freq_model()
-    op = pipeline(model)
+def test_freq_model_initial_state_and_etl():
+    letter_space = _gen_letter_space({
+        ' ': [1],
+        'b': [2],
+        'l': [2],
+        'e': [2]
+    })
+    etl = _etl()
+    model = gen_freq_model(etl)
+    op = train(model)
 
-    res1 = op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
-    pprint(res1)
-    print ("-----")
-    res = op('"2001-01-01T23:52:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b36eaabddb894bc93822a37d0e] INFO module-n2 - Content-Type: application/json;charset=UTF-8","666111222","gothic"'
-             , initial_letter_space=res1[0])
-    pprint(res)
+    msg = '"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"'
+    res = op(msg, [letter_space])
+    print(res)
     assert res is not None
     assert isinstance(res[0], dict)
-    assert res[0].get('1').get_variance() == 0.5
-    assert res[0].get('2').get_variance() == 0.5
-    assert res[0].get('3').get_variance() == 0.5
+
+
+def test_freq_model_initial_state():
+    initial_letter_space = _gen_letter_space({
+        ' ': [1],
+        'b': [2],
+        'l': [2],
+        'e': [2]
+    })
+    model = gen_freq_model(lambda x: x)
+    op = train(model)
+
+    msg = 'hi world'
+    res = op(msg, [initial_letter_space])
+
+    expected_letter_space = _gen_letter_space({
+        ' ': [1, 1],
+        'b': [2],
+        'l': [2, 1],
+        'e': [2],
+        'h': [1],
+        'i': [1],
+        'w': [1],
+        'o': [1],
+        'r': [1],
+        'd': [1]
+    })
+
+    assert res is not None
+    assert isinstance(res[0], dict)
+
+    assert len(set(expected_letter_space) ^ set(res[0])) == 0
+
+
+def test_freq_model_two_steps_train():
+    expected_letter_space = _gen_letter_space({
+        ' ': [1, 1],
+        'b': [2],
+        'l': [2, 1],
+        'e': [2],
+        'h': [1],
+        'i': [1],
+        'w': [1],
+        'o': [1],
+        'r': [1],
+        'd': [1]
+    })
+
+    model = gen_freq_model(lambda x: x)
+    op = train(model)
+
+    re1 = op('ble ble')
+    res = op('hi world', re1)
+
+    assert res is not None
+    assert isinstance(res[0], dict)
+
+    assert len(set(expected_letter_space) ^ set(res[0])) == 0
