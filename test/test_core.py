@@ -9,6 +9,14 @@ from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
 
+def test_train_model_empty():
+    op = train()
+    assert op is not None
+
+    res = op("ble ble")
+    assert res is None
+
+
 def test_empty():
     op = pipeline(None)
     assert op is not None
@@ -47,8 +55,9 @@ def test_multiple_models():
 
 
 def test_multiple_models_three():
-    model1 = gen_freq_model(_etl())
-    model2 = gen_senti_model()
+    etl = _etl()
+    model1 = gen_freq_model(etl)
+    model2 = gen_senti_model(etl)
     op = train(model1, model2, model1)
 
     res = op(

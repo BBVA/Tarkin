@@ -9,14 +9,6 @@ from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
 
-def test_freq_train_model_empty():
-    op = train()
-    assert op is not None
-
-    res = op("ble ble")
-    assert res is None
-
-
 def test_freq_run_model_empty():
     op = check_freq_model(None)
     assert op is not None

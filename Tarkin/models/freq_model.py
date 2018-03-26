@@ -14,13 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from collections import Counter
+from collections import Counter, Callable
 from statistics import mean
 
 from ..service.Stats import Stats
 
 
-def gen_model(etl):
+def gen_model(etl: Callable) -> Callable:
+    """
+     f(etl) -> f(msg, Optional[state]) -> state'
+     :type etl: Callable
+    """
     def _app(msg, letter_space=None):
         if letter_space is None:
             letter_space = {}
@@ -33,7 +37,13 @@ def gen_model(etl):
     return _app
 
 
-def train(message, letter_space):
+def train(message: str, letter_space: dict) -> dict:
+    """
+     f(message, state) -> state'
+
+     :type message: str
+     :param letter_space: dict
+    """
     res = dict(Counter(message.lower()))
     if res is not None:
         for letter, count in res.items():
@@ -47,7 +57,12 @@ def train(message, letter_space):
     return letter_space
 
 
-def check(letter_space):
+def check(letter_space: dict) -> Callable:
+    """
+     f(state) -> f(msg) -> float
+
+     :type letter_space: dict
+    """
     if letter_space is None:
         return lambda *x: None
 
@@ -64,4 +79,4 @@ def check(letter_space):
     return _app
 
 
-__all__ = ["gen_model"]
+__all__ = ["gen_model", "check"]

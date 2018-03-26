@@ -25,42 +25,24 @@ from Tarkin.service.sentiment import load_sentiment_model
 SENTI_DIC = "Tarkin/data/vocab/SentiWordNet_3.0.0_20130122.txt"
 
 
-def gen_model(**kwargs):
+def gen_model(etl: Callable=lambda x: x, senti_file=SENTI_DIC) -> Callable:
 
-    senti_file = kwargs.get('senti_file', SENTI_DIC)
+    scoring_func = load_sentiment_model(senti_file)
 
-    senti_model = load_sentiment_model(senti_file)
-
-    def _app(*args):
-        message = args[-1]
-        return check(message, senti_model)
+    def _app(msg: str):
+        return check(etl(msg), scoring_func)
 
     return _app
 
 
-# should probably have to be added as a parameter of gen_model or check
-def etl():
-    return sequential(
-        csv_to_map([
-            'date', 'file', 'date2', 'log', 'app', 'beat', 'front', 'is_log',
-            'msg', 'offset', 'arch'
-            ]),
-        keep(["msg"])
-    )
-
-
 def check(message: str, sentiment_model: Callable):
-    operation = etl()
 
     try:
-        (res, err) = operation(message)
-        msg = res['msg']
-
-        sentiment_score = sentiment_model(msg)
+        sentiment_score = sentiment_model(message)
     except:
         sentiment_score = -1
 
     return sentiment_score, message
 
 
-__all__ = ["gen_model"]
+__all__ = ["gen_model", "check"]
