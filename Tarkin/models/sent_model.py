@@ -25,24 +25,52 @@ from Tarkin.service.sentiment import load_sentiment_model
 SENTI_DIC = "Tarkin/data/vocab/SentiWordNet_3.0.0_20130122.txt"
 
 
-def gen_model(etl: Callable=lambda x: x, senti_file=SENTI_DIC) -> Callable:
+def gen_model(etl: Callable=lambda x: x) -> Callable:
+    """
+    f(etl) -> f(Optional[state]) -> state'
 
-    scoring_func = load_sentiment_model(senti_file)
+    :param etl: A Callable instance of a transformation function for the message
+    :return:
+    """
 
-    def _app(msg: str):
-        return check(etl(msg), scoring_func)
+    def _app(scoring_dict: str=SENTI_DIC):
+
+        scoring_func = load_sentiment_model(scoring_dict)
+
+        return check(etl, scoring_func)
 
     return _app
 
 
-def check(message: str, sentiment_model: Callable):
+def check(etl: Callable, sentiment_model: Callable):
+    """
+    f(etl, state) -> f(msg) -> (float, msg)
 
-    try:
-        sentiment_score = sentiment_model(message)
-    except:
-        sentiment_score = -1
+    #TODO Passing a Callable with state like sentiment_model feels wrong
 
-    return sentiment_score, message
+    :param etl: A Callable instance of a transformation function for the message
+    :param sentiment_model: A Callable instance of the scoring model
+    :return: A Callable instance of the scoring function
+    """
+
+    def _app(message: str):
+        """
+
+        :param message: The message to be scored
+        :return: The score given by the sentiment model to the received message
+        """
+
+        if sentiment_model is None:
+            return lambda *x: None, message
+
+        try:
+            sentiment_score = sentiment_model(etl(message))
+        except:
+            sentiment_score = -1
+
+        return sentiment_score
+
+    return _app
 
 
-__all__ = ["gen_model", "check"]
+__all__ = ["gen_model"]

@@ -25,12 +25,12 @@ def gen_model(etl: Callable) -> Callable:
      f(etl) -> f(msg, Optional[state]) -> state'
      :type etl: Callable
     """
-    def _app(msg, letter_space=None):
+    def _app(message, letter_space=None):
         if letter_space is None:
             letter_space = {}
 
         if isinstance(letter_space, dict):
-            return train(etl(msg), letter_space)
+            return train(etl(message), letter_space)
 
         raise ValueError("Invalid letterspace")
 
@@ -39,7 +39,7 @@ def gen_model(etl: Callable) -> Callable:
 
 def train(message: str, letter_space: dict) -> dict:
     """
-     f(message, state) -> state'
+     f(msg, state) -> state'
 
      :type message: str
      :param letter_space: dict
@@ -57,20 +57,23 @@ def train(message: str, letter_space: dict) -> dict:
     return letter_space
 
 
-def check(letter_space: dict) -> Callable:
+def check(etl: Callable, letter_space: dict) -> Callable:
     """
-     f(state) -> f(msg) -> float
+    f(state) -> f(msg) -> float
 
-     :type letter_space: dict
+    :param etl: A Callable instance of a transformation function for the message
+    :param letter_space: A dict with a Stats for each letter in the model
+    :return: A Callable instance of the scoring function
     """
+
     if letter_space is None:
         return lambda *x: None
 
-    def char_count(msg):
-        return dict(Counter(msg.lower()))
+    def char_count(message: str):
+        return dict(Counter(message.lower()))
 
-    def _app(msg):
-        chars = char_count(msg)
+    def _app(message: str):
+        chars = char_count(etl(message))
         counts = [
             1 if k not in chars else v.is_in_std(chars[k])
             for k, v in letter_space.items()

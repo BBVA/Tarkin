@@ -1,3 +1,18 @@
+"""
+Copyright 2018 Banco Bilbao Vizcaya Argentaria, S.A.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
 from pytest import raises
 
 from Tarkin.core import pipeline, train, compose
@@ -26,7 +41,7 @@ def _etl():
     return compose(proc, _just_msg)
 
 
-def test_train_senti_model():
+def test_senti_model_train():
     etl = _etl()
     model = gen_senti_model(etl)
     op = train(model)
@@ -35,9 +50,9 @@ def test_train_senti_model():
         op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
 
 
-def test_check_senti_model_basic():
-    model = gen_senti_model()
-    op = pipeline(model)
+def test_senti_model_run():
+    model = gen_senti_model(_etl())
+    op = train(model)
 
     res = op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
     pprint(res)
@@ -45,7 +60,7 @@ def test_check_senti_model_basic():
     assert res[0] == 0.75
 
 
-def test_senti_model_double():
+def test_senti_model_twice():
     model = gen_senti_model()
     op = pipeline(model)
 

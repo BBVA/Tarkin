@@ -10,7 +10,7 @@ from datarefinery.tuple.Formats import csv_to_map
 
 
 def test_freq_run_model_empty():
-    op = check_freq_model(None)
+    op = check_freq_model(None, None)
     assert op is not None
 
     res = op("ble ble")
@@ -44,7 +44,7 @@ def test_freq_train_model():
     assert len(set(expected_letter_space) ^ set(letter_space)) == 0
 
 
-def test_freq_run_model():
+def test_freq_model_run():
     letter_space = _gen_letter_space({
         ' ': [1],
         'b': [2],
@@ -52,7 +52,7 @@ def test_freq_run_model():
         'e': [2]
     })
 
-    model = check_freq_model(letter_space)
+    model = check_freq_model(lambda x: x, letter_space)
     op = pipeline(model)
 
     res = op("ble ble")
