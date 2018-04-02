@@ -14,57 +14,62 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from typing import Callable
+from typing import Callable, Tuple
 
-from datarefinery.CombineOperations import sequential
-from datarefinery.TupleOperations import keep
-from datarefinery.tuple.Formats import csv_to_map
-
-from Tarkin.service.sentiment import load_sentiment_model
-
-SENTI_DIC = "Tarkin/data/vocab/SentiWordNet_3.0.0_20130122.txt"
+from spacy import load as spacy_load
 
 
-def gen_model(etl: Callable=lambda x: x) -> Callable:
+def check(etl: Callable = None):
     """
-    f(etl) -> f(Optional[state]) -> state'
-
-    :param etl: A Callable instance of a transformation function for the message
-    :return:
-    """
-
-    def _app(scoring_dict: str=SENTI_DIC):
-
-        scoring_func = load_sentiment_model(scoring_dict)
-
-        return check(etl, scoring_func)
-
-    return _app
-
-
-def check(etl: Callable, sentiment_model: Callable):
-    """
-    f(etl, state) -> f(msg) -> (float, msg)
+    f(etl) -> f(msg, state) -> float
 
     #TODO Passing a Callable with state like sentiment_model feels wrong
 
     :param etl: A Callable instance of a transformation function for the message
-    :param sentiment_model: A Callable instance of the scoring model
     :return: A Callable instance of the scoring function
     """
 
-    def _app(message: str):
+    if etl is None:
+        etl = lambda x: x
+
+    nlp = spacy_load('en')
+
+    def _tokenize(msg):
+        return [
+            token.lower_ for token in nlp(msg)
+            if not token.is_punct | token.is_space
+        ]
+
+    def _check_word(word, neg, pos):
+        if word in neg:
+            neg_score = neg[word]
+        else:
+            neg_score = 0
+
+        if word in pos:
+            pos_score = pos[word]
+        else:
+            pos_score = 0
+
+        return pos_score + neg_score
+
+    def _check_msg(msg, neg, pos):
+        msg_scores = [_check_word(w, neg, pos) for w in _tokenize(msg)]
+        return sum(msg_scores)
+
+    def _app(message: str, model_state: Tuple[dict, dict] = None):
         """
 
         :param message: The message to be scored
         :return: The score given by the sentiment model to the received message
         """
-
-        if sentiment_model is None:
-            return lambda *x: None, message
+        if model_state is None:
+            (neg, pos) = ({}, {})
+        else:
+            (neg, pos) = model_state
 
         try:
-            sentiment_score = sentiment_model(etl(message))
+            sentiment_score = _check_msg(etl(message), neg, pos)
         except:
             sentiment_score = -1
 
@@ -73,4 +78,4 @@ def check(etl: Callable, sentiment_model: Callable):
     return _app
 
 
-__all__ = ["gen_model"]
+__all__ = ["check"]

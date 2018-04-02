@@ -57,7 +57,7 @@ def train(message: str, letter_space: dict) -> dict:
     return letter_space
 
 
-def check(etl: Callable, letter_space: dict) -> Callable:
+def check(etl: Callable) -> Callable:
     """
     f(state) -> f(msg) -> float
 
@@ -66,13 +66,12 @@ def check(etl: Callable, letter_space: dict) -> Callable:
     :return: A Callable instance of the scoring function
     """
 
-    if letter_space is None:
-        return lambda *x: None
-
     def char_count(message: str):
         return dict(Counter(message.lower()))
 
-    def _app(message: str):
+    def _app(message: str, letter_space: dict):
+        if letter_space is None:
+            return None
         chars = char_count(etl(message))
         counts = [
             1 if k not in chars else v.is_in_std(chars[k])

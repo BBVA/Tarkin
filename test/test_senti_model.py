@@ -13,16 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from pytest import raises
+import re
+import pandas as pd
 
-from Tarkin.core import pipeline, train, compose
-from Tarkin.models.sent_model import gen_model as gen_senti_model
+from Tarkin.core import pipeline
+from Tarkin.models.sent_model import check as check_senti_model
 
 from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
-from pprint import pprint
+
+SENTI_DIC = "Tarkin/data/vocab/SentiWordNet_3.0.0_20130122.txt"
 
 
 def _etl():
@@ -38,39 +40,74 @@ def _etl():
         (res, err) = x
         return res['msg']
 
-    return compose(proc, _just_msg)
+    return lambda x: _just_msg(proc(x))
 
 
-def test_senti_model_train():
-    etl = _etl()
-    model = gen_senti_model(etl)
-    op = train(model)
+def _load_sentiment_model(sentiment_file_path):
+    senti_raw = pd.read_csv(
+        sentiment_file_path,
+        sep="\t",
+        names=["POS", "ID", "PosScore", "NegScore", "SynsetTerms", "Gloss"],
+        skiprows=27,
+        skipfooter=1,
+        engine='python'
+    )
+    senti_raw = senti_raw[(senti_raw['PosScore'] + senti_raw['NegScore']) != 0]
 
-    with raises(TypeError, message="Expecting TypeError: Sentiment model doesn't provide a train(msg, state) function"):
-        op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
+    exploded = senti_raw['SynsetTerms'].apply(
+        lambda x: re.split("\s+", x)
+    ).apply(pd.Series)
+    senti_exploded = pd.concat(
+        [senti_raw[["PosScore", "NegScore"]], exploded],
+        axis=1
+    )
+    senti_norm = pd.melt(
+        senti_exploded,
+        id_vars=["PosScore", "NegScore"],
+        value_vars=range(0, 25)
+    )
+    senti_norm = senti_norm[senti_norm['value'].notnull()]
+    senti_norm['value'] = senti_norm['value'].apply(
+        lambda x: re.sub("#\d+", "", x)
+    )
+    df_senti = senti_norm.groupby("value").mean()
+    df_senti['NegScore'] = df_senti['NegScore'] * -1
+    return df_senti['PosScore'].to_dict(), df_senti['NegScore'].to_dict()
 
 
 def test_senti_model_run():
-    model = gen_senti_model(_etl())
-    op = train(model)
+    model = check_senti_model(_etl())
+    op = pipeline(model)
 
-    res = op('"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
-    pprint(res)
+    dic = _load_sentiment_model(SENTI_DIC)
+
+    res = op(
+        '"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"',
+        [dic]
+    )
+    print(res)
     assert res is not None
-    assert res[0] == 0.75
+    assert 0.75 == res[0]
 
 
 def test_senti_model_twice():
-    model = gen_senti_model()
+    model = check_senti_model()
     op = pipeline(model)
 
+    dic = _load_sentiment_model(SENTI_DIC)
+
     res = op(
-        '"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
-    pprint(res)
+        '"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"',
+        [dic]
+    )
+    print(res)
     assert res is not None
     assert res[0] == 0.75
 
-    res = op('"2001-01-01T23:52:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b36eaabddb894bc93822a37d0e] INFO module-n2 - Content-Type: error application/json;charset=UTF-8","666111222","gothic"')
-    pprint(res)
+    res = op(
+        '"2001-01-01T23:52:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b36eaabddb894bc93822a37d0e] INFO module-n2 - Content-Type: error application/json;charset=UTF-8","666111222","gothic"',
+        [dic]
+    )
+    print(res)
     assert res is not None
     assert res[0] == 0.46875

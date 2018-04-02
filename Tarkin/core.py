@@ -19,42 +19,32 @@ from itertools import repeat
 from typing import Callable, Any
 
 
-def compose(*funcs):
-    def _comp(a, b):
-        def _app(n):
-            return b(a(n))
-
-        return _app
-
-    return reduce(_comp, funcs)
-
-
-def sequential(*operations_tuple: Callable) -> Callable:
-    def _no_operations(*x: Any) -> None:
-        return None
-
-    if operations_tuple is None:
-        return _no_operations
-
-    if len(operations_tuple) > 1:
-        return reduce(compose, operations_tuple)
-    elif len(operations_tuple) == 1:
-        return operations_tuple[0]
-
-    return _no_operations
-
-
-def pipeline(*models: Callable) -> Callable:
-    """
-     f(models) -> f(msg) -> msg
-    """
-    valid_models = list(filter(lambda x: x is not None, models))
-    if len(valid_models) > 0:
-        return sequential(*valid_models)
-    return lambda *x: None
+# def compose(*funcs):
+#     def _comp(a, b):
+#         def _app(n):
+#             return b(a(n))
+#
+#         return _app
+#
+#     return reduce(_comp, funcs)
+#
+#
+# def sequential(*operations_tuple: Callable) -> Callable:
+#     def _no_operations(*x: Any) -> None:
+#         return None
+#
+#     if operations_tuple is None:
+#         return _no_operations
+#
+#     if len(operations_tuple) > 1:
+#         return reduce(compose, operations_tuple)
+#     elif len(operations_tuple) == 1:
+#         return operations_tuple[0]
+#
+#     return _no_operations
 
 
-def train(*models):
+def pipeline(*models):
     """
      f(models) -> f(msg, Optional[states]) -> states
     """
