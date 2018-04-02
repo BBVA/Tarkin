@@ -2,6 +2,7 @@
 
 . utils.sh
 
+mkdir -p Tarkin/data/vocab/
 download_default_dict
 
 mkdir -p Tarkin/input-data/
