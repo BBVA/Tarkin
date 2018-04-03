@@ -16,21 +16,31 @@ limitations under the License.
 
 from collections import Counter, Callable
 from statistics import mean
+from typing import Optional
 
 from ..service.Stats import Stats
 
 
-def gen_model(etl: Callable) -> Callable:
+def gen_model(etl: Optional[Callable] = None) -> Callable:
     """
      f(etl) -> f(msg, Optional[state]) -> state'
      :type etl: Callable
     """
+
+    def no_etl(x):
+        return x
+
+    if etl is None:
+        etl_op = no_etl
+    else:
+        etl_op = etl
+
     def _app(message, letter_space=None):
         if letter_space is None:
             letter_space = {}
 
         if isinstance(letter_space, dict):
-            return train(etl(message), letter_space)
+            return train(etl_op(message), letter_space)
 
         raise ValueError("Invalid letterspace")
 
@@ -57,7 +67,7 @@ def train(message: str, letter_space: dict) -> dict:
     return letter_space
 
 
-def check(etl: Callable) -> Callable:
+def check(etl: Optional[Callable] = None) -> Callable:
     """
     f(state) -> f(msg) -> float
 
@@ -66,13 +76,21 @@ def check(etl: Callable) -> Callable:
     :return: A Callable instance of the scoring function
     """
 
+    def no_etl(x):
+        return x
+
+    if etl is None:
+        etl_op = no_etl
+    else:
+        etl_op = etl
+
     def char_count(message: str):
         return dict(Counter(message.lower()))
 
     def _app(message: str, letter_space: dict):
         if letter_space is None:
             return None
-        chars = char_count(etl(message))
+        chars = char_count(etl_op(message))
         counts = [
             1 if k not in chars else v.is_in_std(chars[k])
             for k, v in letter_space.items()
