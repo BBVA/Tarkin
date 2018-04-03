@@ -22,7 +22,7 @@ from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
-from Tarkin.service.Stats import Stats, read_letter_space
+from models.Stats import Stats, read_letter_space
 from Tarkin.service.sentiment import load_sentiment_model
 
 

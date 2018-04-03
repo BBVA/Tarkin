@@ -2,7 +2,7 @@ from Tarkin.core import pipeline
 from Tarkin.models.freq_model import gen_model as gen_freq_model
 from Tarkin.models.freq_model import check as check_freq_model
 
-from Tarkin.service.Stats import Stats
+from models.Stats import Stats
 
 from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
@@ -10,14 +10,23 @@ from datarefinery.tuple.Formats import csv_to_map
 
 
 def test_freq_run_model_empty():
+    # You can check a model without etl
     op = check_freq_model(None)
+    # but will return a function
     assert op is not None
 
+    # You can check with empty letterspace
     res = op("ble ble", None)
-    assert res is None
+    # But is always strange
+    assert res == 1.0
 
 
 def _gen_letter_space(init):
+    """
+    Create an letter space based on the stats of the elements passed in init.
+    :param init:
+    :return:
+    """
     def _create_stats(l):
         s = Stats()
         for item in l:
@@ -61,6 +70,10 @@ def test_freq_model_run():
 
 
 def _etl():
+    """
+    Provide an etl function for this example.
+    :return:
+    """
     proc = sequential(
         csv_to_map([
             'date', 'file', 'date2', 'log', 'app', 'beat', 'front', 'is_log',

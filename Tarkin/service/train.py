@@ -21,7 +21,7 @@ from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import append, keep, wrap
 from datarefinery.tuple.Formats import csv_to_map
 
-from Tarkin.service.Stats import Stats, read_letter_space, save_letter_space
+from models.Stats import Stats, read_letter_space, save_letter_space
 
 LETTERSPACE_FILEPATH = "Tarkin/input-data/letterspace.pkl"
 

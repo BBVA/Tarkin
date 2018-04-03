@@ -27,6 +27,8 @@ def pipeline(*models, reductor: Optional[Callable] = None):
      if you use it for inference:
 
      f(models) -> f(msg, Optional[states]) -> result
+
+     Also you can pass a named param call reductor to combine the results in one function.
     """
     valid_models = list(filter(lambda x: x is not None, models))
     size_valid_models = len(valid_models)

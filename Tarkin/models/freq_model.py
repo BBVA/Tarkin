@@ -18,13 +18,29 @@ from collections import Counter, Callable
 from statistics import mean
 from typing import Optional
 
-from ..service.Stats import Stats
+from models.Stats import Stats
 
 
 def gen_model(etl: Optional[Callable] = None) -> Callable:
     """
-     f(etl) -> f(msg, Optional[state]) -> state'
-     :type etl: Callable
+     f(Optional[Callable]) -> f(msg, Optional[state]) -> state'
+     :type etl: Optional[Callable]
+    """
+    return _base_model(_generate_state, etl)
+
+
+def check(etl: Optional[Callable] = None) -> Callable:
+    """
+     f(Optional[Callable]) -> f(msg, Optional[state]) -> x
+     :type etl: Optional[Callable]
+    """
+    return _base_model(_score_message, etl)
+
+
+def _base_model(operation: Callable, etl: Optional[Callable] = None) -> Callable:
+    """
+     f(Optional[Callable]) -> f(msg, Optional[x]) -> y
+     :type etl: Optional[Callable]
     """
 
     def no_etl(x):
@@ -40,14 +56,14 @@ def gen_model(etl: Optional[Callable] = None) -> Callable:
             letter_space = {}
 
         if isinstance(letter_space, dict):
-            return train(etl_op(message), letter_space)
+            return operation(etl_op(message), letter_space)
 
         raise ValueError("Invalid letterspace")
 
     return _app
 
 
-def train(message: str, letter_space: dict) -> dict:
+def _generate_state(message: str, letter_space: dict) -> dict:
     """
      f(msg, state) -> state'
 
@@ -67,36 +83,24 @@ def train(message: str, letter_space: dict) -> dict:
     return letter_space
 
 
-def check(etl: Optional[Callable] = None) -> Callable:
+def _score_message(message: str, letter_space: dict) -> float:
     """
-    f(state) -> f(msg) -> float
+     f(msg, state) -> float'
 
-    :param etl: A Callable instance of a transformation function for the message
-    :param letter_space: A dict with a Stats for each letter in the model
-    :return: A Callable instance of the scoring function
+     :type message: str
+     :param letter_space: dict
     """
+    def char_count(m: str):
+        return dict(Counter(m.lower()))
 
-    def no_etl(x):
-        return x
-
-    if etl is None:
-        etl_op = no_etl
-    else:
-        etl_op = etl
-
-    def char_count(message: str):
-        return dict(Counter(message.lower()))
-
-    def _app(message: str, letter_space: dict):
-        if letter_space is None:
-            return None
-        chars = char_count(etl_op(message))
-        counts = [
-            1 if k not in chars else v.is_in_std(chars[k])
-            for k, v in letter_space.items()
-        ]
+    chars = char_count(message)
+    counts = [
+        1 if k not in chars else v.is_in_std(chars[k])
+        for k, v in letter_space.items()
+    ]
+    if len(counts) > 1:
         return mean(counts)
-    return _app
+    return 1.0
 
 
 __all__ = ["gen_model", "check"]

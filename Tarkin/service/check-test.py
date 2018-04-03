@@ -17,7 +17,7 @@ import sys
 from json import dumps
 
 from service.check import surprise_model
-from service.Stats import Stats, read_letter_space
+from models.Stats import Stats, read_letter_space
 from service.sentiment import load_sentiment_model
 
 TEST_METRICS_FILE = "Tarkin/metrics/check-test-metrics.txt"

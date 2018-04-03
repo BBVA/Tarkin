@@ -23,8 +23,6 @@ def check(etl: Callable = None):
     """
     f(etl) -> f(msg, state) -> float
 
-    #TODO Passing a Callable with state like sentiment_model feels wrong
-
     :param etl: A Callable instance of a transformation function for the message
     :return: A Callable instance of the scoring function
     """
@@ -59,7 +57,6 @@ def check(etl: Callable = None):
 
     def _app(message: str, model_state: Tuple[dict, dict] = None):
         """
-
         :param message: The message to be scored
         :return: The score given by the sentiment model to the received message
         """

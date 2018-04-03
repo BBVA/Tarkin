@@ -93,3 +93,4 @@ def test_train_run_reduce_several():
     score = op2("ble ble", st)
 
     assert score > 1
+
