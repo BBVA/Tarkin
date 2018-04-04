@@ -98,7 +98,7 @@ def _score_message(message: str, letter_space: dict) -> float:
         1 if k not in chars else v.is_in_std(chars[k])
         for k, v in letter_space.items()
     ]
-    if len(counts) > 1:
+    if len(counts) > 0:
         return mean(counts)
     return 1.0
 
