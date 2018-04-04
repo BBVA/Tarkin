@@ -1,6 +1,6 @@
 from Tarkin.core import pipeline
-from Tarkin.models.freq_model import gen_model as gen_freq_model
-from Tarkin.models.freq_model import check as check_freq_model
+from Tarkin.models.freq.freq_model import gen_model as gen_freq_model
+from Tarkin.models.freq.freq_model import check as check_freq_model
 from Tarkin.models.sent_model import check as check_sent_model
 
 from datarefinery.CombineOperations import sequential

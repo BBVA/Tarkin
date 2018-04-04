@@ -2,8 +2,8 @@
 .idea/*
 Tarkin/metrics/*
 Tarkin/data/vocab/*
-Tarkin/input-data/*
-Tarkin/notebooks/.ipynb_checkpoints/
+examples/fear-pipeline/input-data/*
+notebooks/.ipynb_checkpoints/
 /**/__pycache__/
 /**/letterspace.pkl
 .pytest_cache/

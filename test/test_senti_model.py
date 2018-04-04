@@ -23,8 +23,8 @@ from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
-
-SENTI_DIC = "Tarkin/data/vocab/SentiWordNet_3.0.0_20130122.txt"
+# TODO use only synthetic data
+SENTI_DIC = "examples/fear-pipeline/data/vocab/SentiWordNet_3.0.0_20130122.txt"
 
 
 def _etl():
