@@ -28,7 +28,7 @@ class Stats:
         self.max = 0
         self.min = 0
 
-    def add_variable(self, x):
+    def add_variable(self, x: float):
         if self.n == 0:
             self.K = x
         self.n += 1
