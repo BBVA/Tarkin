@@ -2,7 +2,7 @@ from Tarkin.core import pipeline
 from Tarkin.models.freq_model import gen_model as gen_freq_model
 from Tarkin.models.freq_model import check as check_freq_model
 
-from models.Stats import Stats
+from Tarkin.models.Stats import Stats
 
 from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep

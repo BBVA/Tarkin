@@ -14,12 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Dict, Any, List, Optional
 
 from spacy import load as spacy_load
 
 
-def check(etl: Callable = None):
+Words = Dict[str, float]
+Sentiment = Tuple[Words, Words]
+
+
+def check(etl: Optional[Callable[[Any], str]] = None) -> Callable[[str, Sentiment], float]:
     """
     f(etl) -> f(msg, state) -> float
 
@@ -27,18 +31,23 @@ def check(etl: Callable = None):
     :return: A Callable instance of the scoring function
     """
 
+    def _unit(x):
+        return x
+
     if etl is None:
-        etl = lambda x: x
+        etl_op = _unit
+    else:
+        etl_op = etl
 
     nlp = spacy_load('en')
 
-    def _tokenize(msg):
+    def _tokenize(msg: str) -> List[str]:
         return [
             token.lower_ for token in nlp(msg)
             if not token.is_punct | token.is_space
         ]
 
-    def _check_word(word, neg, pos):
+    def _check_word(word: str, neg: Words, pos: Words) -> float:
         if word in neg:
             neg_score = neg[word]
         else:
@@ -51,11 +60,11 @@ def check(etl: Callable = None):
 
         return pos_score + neg_score
 
-    def _check_msg(msg, neg, pos):
+    def _check_msg(msg: str, neg: Words, pos: Words) -> float:
         msg_scores = [_check_word(w, neg, pos) for w in _tokenize(msg)]
         return sum(msg_scores)
 
-    def _app(message: str, model_state: Tuple[dict, dict] = None):
+    def _app(message: str, model_state: Sentiment = None) -> float:
         """
         :param message: The message to be scored
         :return: The score given by the sentiment model to the received message
@@ -66,9 +75,10 @@ def check(etl: Callable = None):
             (neg, pos) = model_state
 
         try:
-            sentiment_score = _check_msg(etl(message), neg, pos)
+            sentiment_score = _check_msg(etl_op(message), neg, pos)
         except:
-            sentiment_score = -1
+            # TODO: -1.0 it's not a good decision
+            sentiment_score = -1.0
 
         return sentiment_score
 
