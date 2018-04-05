@@ -56,11 +56,6 @@ def surprise_model(letter_space):
 
 
 def check():
-
-    print(LETTER_SPACE)
-    import os
-    print(os.getcwd())
-
     letter_space = read_letter_space(LETTER_SPACE)
     if letter_space is None:
         raise RuntimeError("A letterspace file is required and couldn't be found")

@@ -2,12 +2,18 @@
 
 . utils.sh
 
-mkdir -p Tarkin/data/vocab/
+pushd ../../
+python setup.py sdist
+popd
+
+mkdir -p data/vocab/
 download_default_dict
 
-mkdir -p Tarkin/input-data/
-mkdir -p Tarkin/metrics/
+mkdir -p input-data/
+mkdir -p metrics/
 
-docker build --rm -f Dockerfile-check -t tarkin-check:latest .
-docker build --rm -f Dockerfile-check-demo -t tarkin-check-demo:latest .
-docker build --rm -f Dockerfile-train -t tarkin-train:latest .
+cp -r ../../dist .
+
+docker build --rm -f docker/Dockerfile-check -t tarkin-check:latest .
+docker build --rm -f docker/Dockerfile-check-demo -t tarkin-check-demo:latest .
+docker build --rm -f docker/Dockerfile-train -t tarkin-train:latest .

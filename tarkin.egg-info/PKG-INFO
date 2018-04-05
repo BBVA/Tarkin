@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: tarkin
+Version: 0.0.2
+Summary: Fear-based detection of Security Anomalies in Log Data
+Home-page: https://github.com/BBVA/Tarkin
+Author: Daniel Hernández León (@deccar), Cesar Gallego Rodríguez (@CesarGallegoR)
+Author-email: Cesar Gallego <cesar.gallego@bbva.com>, Daniel Hernández <daniel.hleon@bbva.com>
+License: Apache 2.0 License
+Description: UNKNOWN
+Keywords: Anomalies,Logs,Security,AI,Sentiment,Fear,Rooted
+Platform: UNKNOWN

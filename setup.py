@@ -14,23 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from distutils.core import setup
-from os.path import join, dirname
+import os
+
 from setuptools import find_packages
 
 
-with open(join(dirname(__file__), 'requirements.txt')) as f:
+with open(os.path.join(os.path.dirname(__file__), 'requirements.txt')) as f:
     required = f.read().splitlines()
 
 setup(
     name='tarkin',
-    version='0.0.1',
+    version='0.0.2',
     install_requires=required,
     packages=find_packages(),
     include_package_data=True,
-    entry_points={'console_scripts': [
-        'tarkin-train = Tarkin.train:main',
-        'tarkin-check = Tarkin.check:main',
-    ]},
     description='Fear-based detection of Security Anomalies in Log Data',
     url='https://github.com/BBVA/Tarkin',
     keywords=["Anomalies", "Logs", "Security", "AI", "Sentiment", "Fear", "Rooted"],

@@ -16,14 +16,14 @@ limitations under the License.
 import sys
 from json import dumps
 
-from examples.check import surprise_model
+from check import surprise_model
 from Tarkin.models.freq.Stats import Stats, read_letter_space
-from examples.sentiment import load_sentiment_model
+from sentiment import load_sentiment_model
 
-TEST_METRICS_FILE = "Tarkin/metrics/check-test-metrics.txt"
+TEST_METRICS_FILE = "metrics/check-test-metrics.txt"
 
-SENTI_DIC = "Tarkin/data/vocab/SentiWordNet_3.0.0_20130122.txt"
-LETTER_SPACE = "Tarkin/input-data/letterspace.pkl"
+SENTI_DIC = "data/vocab/SentiWordNet_3.0.0_20130122.txt"
+LETTER_SPACE = "input-data/letterspace.pkl"
 
 
 def check_test():
