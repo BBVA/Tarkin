@@ -9,3 +9,5 @@ notebooks/.ipynb_checkpoints/
 .pytest_cache/
 /.env/
 /dist
+/build
+/tarkin.egg-info
