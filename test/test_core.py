@@ -23,7 +23,7 @@ def _etl():
         csv_to_map([
             'date', 'file', 'date2', 'log', 'app', 'beat', 'front', 'is_log',
             'msg', 'offset', 'arch'
-        ]),
+        ], delimiter=";"),
         keep(["msg"])
     )
 
@@ -40,7 +40,7 @@ def test_multiple_models():
     op = pipeline(model1, model2)
 
     res = op(
-        '"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
+        '"2001-01-01T23:51:03.294Z";"/var/log/resources-server.log";"2001-01-01T23:51:01.873Z";"resources-store";"resource";"{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}";"backend-server";"log";"01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8";"666111222";"gothic"')
     print(res)
     assert res is not None
 
@@ -52,7 +52,7 @@ def test_multiple_models_three():
     op = pipeline(model1, model2, model1)
 
     res = op(
-        '"2001-01-01T23:51:03.294Z","/var/log/resources-server.log","2001-01-01T23:51:01.873Z","resources-store","resource","{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}","backend-server","log","01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8","666111222","gothic"')
+        '"2001-01-01T23:51:03.294Z";"/var/log/resources-server.log";"2001-01-01T23:51:01.873Z";"resources-store";"resource";"{""hostname"":""198-51-100-15"",""name"":""198-51-100-15"",""address"":""198-51-100-15"",""version"":""1.7.0""}";"backend-server";"log";"01/01/2001 18:51:00.934 [b3ef51b16eaabddb894bc93822a37d0e] INFO module-n - Content-Type: application/json;charset=UTF-8";"666111222";"gothic"')
     print(res)
     assert res is not None
 

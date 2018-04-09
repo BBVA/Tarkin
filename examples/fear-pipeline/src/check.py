@@ -14,15 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import sys
-from collections import Counter
-from statistics import mean
 from json import dumps as json_dumps
 
 from datarefinery.CombineOperations import sequential
 from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
+from Tarkin.core import pipeline
 from Tarkin.models.freq.Stats import Stats, read_letter_space
+from Tarkin.models.freq.freq_model import check as check_freq
+from Tarkin.models.sent_model import check as check_sent
+
 from sentiment import load_sentiment_model
 
 
@@ -31,27 +33,50 @@ SENTI_DIC = "./data/vocab/SentiWordNet_3.0.0_20130122.txt"
 LETTER_SPACE = "./input-data/letterspace.pkl"
 
 
-def etl():
-    return sequential(
+def _etl():
+    proc = sequential(
         csv_to_map([
             'date', 'file', 'date2', 'log', 'app', 'beat', 'front', 'is_log',
             'msg', 'offset', 'arch'
-            ]),
+            ], delimiter=";"),
         keep(["msg"])
     )
 
+    def _just_msg(x):
+        (res, err) = proc(x)
+        if err is not None:
+            print(x, err)
+        return res['msg']
 
-def surprise_model(letter_space):
-    def char_count(msg):
-        return dict(Counter(msg.lower()))
+    return _just_msg
 
-    def _app(msg):
-        chars = char_count(msg)
-        counts = [
-            1 if k not in chars else v.is_in_std(chars[k])
-            for k, v in letter_space.items()
-        ]
-        return mean(counts)
+
+def _check_model_result():
+    surprise_threshold = Stats()
+
+    def _app(models):
+        nonlocal surprise_threshold
+        result = None
+        try:
+            surprise = next(models)
+
+            surprise_max = surprise_threshold.max
+            surprise_variance = surprise_threshold.get_std()
+            if surprise > surprise_max - surprise_variance:
+                sentiment = next(models)
+                if sentiment <= 0:
+                    result = {"surprise": surprise, "sentiment_score": sentiment}
+            surprise_threshold = surprise_threshold.add_variable(surprise)
+        except:
+            return {"surprise": 1, "sentiment_score": -1}
+
+        try:
+            with open(CHECK_METRICS_FILE, 'a') as metrics_output:
+                print(surprise_threshold, file=metrics_output)
+        except:
+            print(surprise_threshold, file=sys.stderr)
+        return result
+
     return _app
 
 
@@ -60,31 +85,25 @@ def check():
     if letter_space is None:
         raise RuntimeError("A letterspace file is required and couldn't be found")
 
-    operation = etl()
-    surprise = surprise_model(letter_space)
-    surprise_threshold = Stats()
+    sentiment_dict = load_sentiment_model(SENTI_DIC)
+    if sentiment_dict is None:
+        raise RuntimeError("A sentiment dict file is required and couldn't be found")
 
-    sentiment_model = load_sentiment_model(SENTI_DIC)
+    s = [letter_space, sentiment_dict]
+
+    operation = _etl()
+
+    surprise = check_freq(operation)
+
+    sentiment = check_sent(operation)
+
+    model_check = pipeline(surprise, sentiment, reductor=_check_model_result())
 
     for line in sys.stdin:
-        try:
-            (res, err) = operation(line)
-            msg = res['msg']
-            surprise_score = surprise(msg)
-
-            surprise_max = surprise_threshold.max
-            surprise_variance = surprise_threshold.get_std()
-            if surprise_score > surprise_max - surprise_variance:
-                sentiment_score = sentiment_model(msg)
-                if sentiment_score <= 0:
-                    print(json_dumps({"surprise": surprise_score, "sentiment_score": sentiment_score}))
-            surprise_threshold = surprise_threshold.add_variable(surprise_score)
-
-        except:
-            print(json_dumps({"surprise": 1, "sentiment_score": -1}))
-
-    with open(CHECK_METRICS_FILE, 'w') as metrics_output:
-        print(surprise_threshold, file=metrics_output)
+        res = model_check(line, s)
+        if res is not None:
+            res['msg'] = line
+            print(json_dumps(res))
 
 
 if __name__ == '__main__':

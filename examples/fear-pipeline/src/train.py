@@ -14,47 +14,45 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import sys
-from collections import Counter
 from pprint import pprint
 
 from datarefinery.CombineOperations import sequential
-from datarefinery.TupleOperations import append, keep, wrap
+from datarefinery.TupleOperations import keep
 from datarefinery.tuple.Formats import csv_to_map
 
-from Tarkin.models.freq.Stats import Stats, read_letter_space, save_letter_space
+from Tarkin.models.freq.Stats import read_letter_space, save_letter_space
+from Tarkin.models.freq.freq_model import gen_model
+from Tarkin.core import pipeline
 
 LETTERSPACE_FILEPATH = "input-data/letterspace.pkl"
 
 
 def etl():
-    return sequential(
+    proc = sequential(
         csv_to_map([
             'date', 'file', 'date2', 'log', 'app', 'beat', 'front', 'is_log',
             'msg', 'offset', 'arch'
-            ]),
-        keep(["msg"]),
-        append(['msg'], wrap(lambda x: dict(Counter(x.lower()))))
+            ], delimiter=";"),
+        keep(["msg"])
     )
+
+    def _just_msg(x):
+        (res, err) = proc(x)
+        if err is not None:
+            print(x, err)
+        return res['msg']
+
+    return _just_msg
 
 
 def train():
-    letter_space = read_letter_space(LETTERSPACE_FILEPATH)
-    if letter_space is None:
-        letter_space = {}
-    operation = etl()
+    letter_space = [read_letter_space(LETTERSPACE_FILEPATH)]
+    op = pipeline(gen_model(etl()))
 
     for line in sys.stdin:
-        (res, err) = operation(line)
-        if res is not None:
-            for letter, count in res.items():
-                if letter not in letter_space:
-                    stats = Stats()
-                else:
-                    stats = letter_space[letter]
+        letter_space = op(line, letter_space)
 
-                letter_space[letter] = stats.add_variable(count)
-
-    save_letter_space(LETTERSPACE_FILEPATH, letter_space)
+    save_letter_space(LETTERSPACE_FILEPATH, letter_space[0])
     pprint(letter_space)
 
 
