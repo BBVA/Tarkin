@@ -16,8 +16,6 @@ limitations under the License.
 import re
 import pandas as pd
 
-from spacy import load as spacy_load
-
 
 def load_sentiment_model(sentiment_file_path):
     try:

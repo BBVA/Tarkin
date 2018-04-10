@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import os
 import sys
 from json import dumps as json_dumps
 
@@ -28,9 +29,9 @@ from Tarkin.models.sent_model import check as check_sent
 from sentiment import load_sentiment_model
 
 
-CHECK_METRICS_FILE = "metrics/check-metrics.txt"
-SENTI_DIC = "./data/vocab/SentiWordNet_3.0.0_20130122.txt"
-LETTER_SPACE = "./input-data/letterspace.pkl"
+CHECK_METRICS_FILE = os.getenv('CHECK_METRICS_FILE', "metrics/check-metrics.txt")
+SENTI_DIC = os.getenv('SENTI_DIC', "./data/vocab/SentiWordNet_3.0.0_20130122.txt")
+LETTER_SPACE = os.getenv('LETTERSPACE_FILENAME', "./input-data/letterspace.pkl")
 
 
 def _etl():

@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import os
 import sys
 from pprint import pprint
 
@@ -24,7 +25,7 @@ from Tarkin.models.freq.Stats import read_letter_space, save_letter_space
 from Tarkin.models.freq.freq_model import gen_model
 from Tarkin.core import pipeline
 
-LETTERSPACE_FILEPATH = "input-data/letterspace.pkl"
+LETTERSPACE_FILEPATH = os.getenv('LETTERSPACE_FILENAME', "input-data/letterspace.pkl")
 
 
 def etl():

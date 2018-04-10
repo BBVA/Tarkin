@@ -9,7 +9,7 @@ popd
 mkdir -p data/vocab/
 download_default_dict
 
-mkdir -p input-data/
+mkdir -p freq-data/
 mkdir -p metrics/
 
 cp -r ../../dist .

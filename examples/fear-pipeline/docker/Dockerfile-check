@@ -7,7 +7,7 @@ COPY requirements.txt /tarkin/requirements.txt
 COPY src /tarkin/src
 COPY dist /tarkin/dist
 
-RUN ["sh", "-c", "pip install -r /tarkin/requirements.txt"]
+RUN pip install -r requirements.txt
 
 FROM python:3.6.3-slim
 

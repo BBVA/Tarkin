@@ -11,4 +11,5 @@ examples/fear-pipeline/input-data/*
 examples/fear-pipeline/dist
 /build
 /tarkin.egg-info
+/dist
 

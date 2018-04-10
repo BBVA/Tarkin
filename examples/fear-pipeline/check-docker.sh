@@ -5,7 +5,7 @@
 CHECK_INPUT_FILE=${1:-data/input-logs-example-file.csv}
 check_file_existence $CHECK_INPUT_FILE
 
-LETTERSPACE_FILENAME=${2:-input-data/letterspace.pkl}
+LETTERSPACE_FILENAME=${2:-freq-data/letterspace.pkl}
 check_file_existence $LETTERSPACE_FILENAME
 
 TMPDIRNAME=$(create_temp_dir)
