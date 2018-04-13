@@ -1,0 +1,7 @@
+pandas==0.21.0
+spacy==2.0.9
+data-refinery==0.2.13
+pytest
+pytest-cov
+flake8
+bumpversion
