@@ -8,10 +8,10 @@ COPY .pipcache/3.5/pip /root/.cache/pip
 
 
 COPY requirements.txt /app/requirements.txt
-RUN pip install -r requirements.txt && rm /app/requirements.txt
+RUN pip wheel --wheel-dir=/root/.cache/pip/w -r requirements.txt && rm /app/requirements.txt
 
 COPY requirements-dev.txt /app/requirements.txt
-RUN pip install -r requirements.txt && rm /app/requirements.txt
+RUN pip wheel --wheel-dir=/root/.cache/pip/w -r requirements.txt && rm /app/requirements.txt
 
 
 RUN chmod -R 777 /root/.cache
