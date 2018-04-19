@@ -20,6 +20,7 @@ jobs:
     environment:
       VERSION=3.6.3
       ENV=test
+      PYTHONPATH=$PWD
 
     steps:
       - checkout
