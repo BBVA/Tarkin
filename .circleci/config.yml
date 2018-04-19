@@ -17,7 +17,7 @@ jobs:
     environment:
       VERSION: 3.6.3
       ENV: test
-      PYTHONPATH: ~/tarkin
+      PYTHONPATH: /root/tarkin
 
     steps:
       - checkout
