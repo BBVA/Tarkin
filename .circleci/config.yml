@@ -43,7 +43,7 @@ jobs:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements-dev.txt" }}
         
-      # run tests!
+      # run tests
       - run:
           name: run tests
           command: |
