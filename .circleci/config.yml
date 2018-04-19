@@ -1,0 +1,55 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+general:
+  branches:
+    only:
+      - move_models
+jobs:
+  build:
+    docker:
+      - image: python:3.6.3-slim
+      
+    working_directory: ~/tarkin
+
+    environment:
+      VERSION: 3.6.3
+      ENV: test
+      PYTHONPATH: /root/tarkin
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "requirements-dev.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            apt-get update && apt-get install -y build-essential
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements-dev.txt
+            python -m spacy download en
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements-dev.txt" }}
+        
+      # run tests
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            pytest test
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
