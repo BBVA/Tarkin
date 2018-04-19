@@ -15,7 +15,11 @@ jobs:
       # - image: circleci/python:3.6.1
       - image: python:3.6.3-slim
       
-    working_directory: ~/repo
+    working_directory: ~/tarkin
+
+    environment:
+      VERSION=3.6.3
+      ENV=test
 
     steps:
       - checkout
@@ -34,7 +38,11 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements-dev.txt
-            
+
+      - run:
+          name:
+          command: python -m spacy download en
+
       - save_cache:
           paths:
             - ./venv
