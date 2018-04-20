@@ -13,4 +13,5 @@ examples/fear-pipeline/dist
 /tarkin.egg-info
 /dist
 /.pipcache
+/.pytest_cache
 .coverage
