@@ -50,7 +50,6 @@ In OS X you can install Python using [Brew](https://brew.sh) like this:
 
     $ brew install python3
 
-
 For other Linux flavors and Windows, packages are available at
 
 [http://www.python.org/getit/](http://www.python.org/getit/)
