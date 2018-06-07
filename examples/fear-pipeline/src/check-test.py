@@ -57,16 +57,11 @@ def _check_model_result():
 
     def _app(models):
         nonlocal surprise_threshold
-        result = None
         try:
             surprise = next(models)
 
-            surprise_max = surprise_threshold.max
-            surprise_variance = surprise_threshold.get_std()
-            if surprise > surprise_max - surprise_variance:
-                sentiment = next(models)
-                if sentiment <= 0:
-                    result = {"surprise": surprise, "sentiment_score": sentiment}
+            sentiment = next(models)
+            result = {"surprise": surprise, "sentiment_score": sentiment}
             surprise_threshold = surprise_threshold.add_variable(surprise)
         except:
             return {"surprise": 1, "sentiment_score": -1}
