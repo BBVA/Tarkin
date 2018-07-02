@@ -8,6 +8,7 @@ WORKDIR /app
 
 COPY .pipcache/3.6.3 /root/.cache/
 COPY requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip
 RUN pip install --no-index --find-links=/root/.cache/pip/w -r requirements.txt
 
 RUN python -m spacy download en

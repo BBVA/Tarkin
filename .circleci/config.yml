@@ -10,7 +10,7 @@ general:
 jobs:
   build:
     docker:
-      - image: python:3.6.3-slim
+      - image: docker:18.05.0-ce-git
       
     working_directory: ~/tarkin
 
@@ -21,13 +21,57 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "requirements-dev.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            apk add --no-cache alpine-sdk && \
+            apk add --no-cache python3 && \
+            apk add --no-cache python3-dev && \
+            python3 -m ensurepip --upgrade && \
+            if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
+            if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
+            pip3 install --upgrade pip && \
+            pip3 install --upgrade virtualenv setuptools
+
+          # python3 -m venv venv
+          # source venv/bin/activate
+          # pip3 install --upgrade -r requirements.txt
+          # python -m spacy download en
+          #  rm -rf /root/.cache
+
+
+          # apt-get update && apt-get install -y build-essential
+          # python3 -m venv venv
+          # . venv/bin/activate
+          # pip install -r requirements-dev.txt
+          # python -m spacy download en
+
+      - deploy:
+          name: Push images to docker hub
+          command: |
+            make
+            docker tag tarkin_pro_3.6.3 $DOCKER_HUB_USER_ID/tarkin:0.0.2
+            docker tag tarkin_pro_3.6.3 $DOCKER_HUB_USER_ID/tarkin:latest
+            docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+            docker push $DOCKER_HUB_USER_ID/tarkin:0.0.2
+            docker push $DOCKER_HUB_USER_ID/tarkin:latest
+
+  test:
+
+    docker:
+      - image: python:3.6.3-slim
+
+    working_directory: ~/tarkin
+
+    environment:
+      VERSION: 3.6.3
+      ENV: test
+      PYTHONPATH: /root/tarkin
+
+    steps:
+      - checkout
 
       - run:
           name: install dependencies
@@ -38,18 +82,24 @@ jobs:
             pip install -r requirements-dev.txt
             python -m spacy download en
 
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements-dev.txt" }}
-        
-      # run tests
       - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            pytest test
+            name: test
+            command: |
+              . venv/bin/activate
+              mkdir test-reports
+              pytest test --junitxml=test-reports/junit.xml
+
+      - store_test_results:
+          path: test-reports
+          destination: junit.xml
 
       - store_artifacts:
           path: test-reports
-          destination: test-reports
+
+
+workflows:
+  version: 2
+  test-and-build-image:
+    jobs:
+      - test
+      - build
